@@ -8,11 +8,16 @@ class BlogController {
     }
 
     public function createPost($title, $content) {
-        if (strlen($title) > 50) {
-            throw new Exception("Title cannot exceed 50 characters.");
+        try {
+            if (strlen($title) > 50) {
+                throw new Exception("Title cannot exceed 50 characters.");
+            }
+            $stmt = $this->db->prepare("INSERT INTO posts (title, content) VALUES (?, ?)");
+            $stmt->execute([$title, $content]);
+            echo "Post created successfully";
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage();
         }
-        $stmt = $this->db->prepare("INSERT INTO posts (title, content) VALUES (?, ?)");
-        $stmt->execute([$title, $content]);
     }
 
     public function getPosts() {
@@ -21,13 +26,36 @@ class BlogController {
     }
 
     public function updatePost($id, $title, $content) {
-        $stmt = $this->db->prepare("UPDATE posts SET title = ?, content = ? WHERE id = ?");
-        $stmt->execute([$title, $content, $id]);
+        try {
+            if (strlen($title) > 50) {
+                throw new Exception("Title cannot exceed 50 characters.");
+            }
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM posts WHERE id = ?");
+            $stmt->execute([$id]);
+            if ($stmt->fetchColumn() == 0) {
+                throw new Exception("Post not found.");
+            }
+            $stmt = $this->db->prepare("UPDATE posts SET title = ?, content = ? WHERE id = ?");
+            $stmt->execute([$title, $content, $id]);
+            echo "Post updated successfully";
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
     }
 
     public function deletePost($id) {
-        $stmt = $this->db->prepare("DELETE FROM posts WHERE id = ?");
-        $stmt->execute([$id]);
+        try {
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM posts WHERE id = ?");
+            $stmt->execute([$id]);
+            if ($stmt->fetchColumn() == 0) {
+                throw new Exception("Post not found.");
+            }
+            $stmt = $this->db->prepare("DELETE FROM posts WHERE id = ?");
+            $stmt->execute([$id]);
+            echo "Post deleted successfully";
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
     }
 }
 ?> 

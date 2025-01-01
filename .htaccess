@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Deny access to .env file
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Redirect all requests to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
